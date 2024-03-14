@@ -128,6 +128,7 @@
 
         // 서버로 데이터 전송
         var formData = new FormData();
+        formData.append('command', 1);
         formData.append('nickname', nickname);
         formData.append('number', selectedButton);
 
