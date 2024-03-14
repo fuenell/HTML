@@ -68,9 +68,9 @@
 </form>
 
 <div class="button-container" id="button-container">
-    <div class="button button1" id="button1" value="1">왼쪽</div>
-    <div class="button button2" id="button2" value="2">고민 중</div>
-    <div class="button button3" id="button3" value="3">오른쪽</div>
+    <div class="button button1" id="button1" data-value="1">왼쪽</div>
+    <div class="button button2" id="button2" data-value="2">고민 중</div>
+    <div class="button button3" id="button3" data-value="3">오른쪽</div>
 </div>
 
 <script>
@@ -106,24 +106,42 @@
             }
             document.getElementById(buttonId).classList.add('selected');
             selectedButtonId = buttonId;
-            sendData(selectedButtonId);
+            sendData(document.getElementById(buttonId).getAttribute("data-value"));
     }
 
     // 버튼 컨테이너의 높이를 화면의 높이의 일정 비율로 조절하는 함수
     function adjustButtonContainerHeight() {
         var buttonContainer = document.getElementById("button-container");
         var windowHeight = window.innerHeight;
-        buttonContainer.style.height = windowHeight * 0.25 + "px"; // 화면 높이의 30%로 설정
+
+        if (window.matchMedia("(max-width: 768px)").matches) {
+            // 화면 너비가 768px 이하인 경우에만 높이를 조절합니다.
+            buttonContainer.style.height = windowHeight * 0.25 + "px"; // 화면 높이의 25%로 설정
+        }
+        else{
+            buttonContainer.style.height = windowHeight * 0.75 + "px"; // 화면 높이의 25%로 설정
+        }
     }
 
-    function sendData(selectedButtonId) {
+    function sendData(selectedButton) {
         var nickname = document.getElementById("nickname").value;
 
         // 서버로 데이터 전송
-        // 예를 들어, AJAX를 사용하여 서버에 데이터를 전송할 수 있습니다.
-        // 아래는 간단한 예시입니다.
-        console.log("닉네임:", nickname);
-        console.log("선택한 번호:", selectedButtonId);
+        var formData = new FormData();
+        formData.append('nickname', nickname);
+        formData.append('number', selectedButton);
+
+        fetch('https://script.google.com/macros/s/AKfycbwQ0rF7XF009YMpJgvtxVbSxtMwcsHPwT_Zd2NanPnghTlNc3HhiK0icviVTUOV0IrF/exec', { // 엔드포인트 URL을 여기에 입력합니다.
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log(data); // 응답을 콘솔에 출력합니다.
+        })
+        .catch(error => {
+            console.error('에러 발생:', error);
+        });
     }
 
     // 페이지 로드 및 리사이즈 시 버튼 컨테이너 높이 조절
